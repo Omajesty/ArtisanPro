@@ -1,0 +1,12 @@
+docs/
+ArtisanPro_Overview.md
+
+# secrets
+.env
+
+# Python
+.venv/
+__pycache__/
+
+# Node
+node_modules/
