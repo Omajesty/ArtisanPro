@@ -21,6 +21,12 @@ class Settings(BaseSettings):
     postgres_host: str = "localhost"
     postgres_port: int = 5432
 
+    jwt_secret_key: SecretStr
+    jwt_algorithm: str = "HS256"
+    access_token_expire_minutes: int = 60 * 24
+    # Cookies marked Secure are only sent over HTTPS: false for local http, true in production.
+    cookie_secure: bool = False
+
     @property
     def database_url(self) -> URL:
         return URL.create(

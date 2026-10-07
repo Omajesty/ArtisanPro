@@ -1,7 +1,7 @@
 from datetime import datetime
 from enum import StrEnum
 
-from sqlalchemy import Column, DateTime, Enum, func, true
+from sqlalchemy import Column, DateTime, Enum, Index, func, true
 from sqlmodel import Field, SQLModel
 
 
@@ -16,7 +16,8 @@ class User(SQLModel, table=True):
     __tablename__ = "users"
 
     id: int | None = Field(default=None, primary_key=True)
-    email: str = Field(max_length=255, unique=True, index=True)
+    # Uniqueness is enforced case-insensitively by the index at the bottom of this file.
+    email: str = Field(max_length=255)
     password_hash: str = Field(max_length=255)
     full_name: str = Field(max_length=120)
     phone: str | None = Field(default=None, max_length=20)
@@ -42,3 +43,8 @@ class User(SQLModel, table=True):
             DateTime(timezone=True), nullable=False, server_default=func.now(), onupdate=func.now()
         ),
     )
+
+
+# One account per email regardless of case: "Sam@Gmail.com" and "sam@gmail.com" collide.
+# Lookups must use func.lower(User.email) so PostgreSQL can use this index.
+Index("uq_users_email_lower", func.lower(User.__table__.c.email), unique=True)
